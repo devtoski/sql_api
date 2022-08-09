@@ -1,0 +1,86 @@
+const { hash: hashPassword, compare: comparePassword } = require('../utils/password');
+const db=require('../confiq/db.confiq')
+const { createNewUser: createNewUserQuery, findUserByEmail: findUserByEmailQuery, getAll:getAllQuery, updateById:updateByIdQuery, Delete:DeleteQuery } = require('../database/queries');
+const { body, validationResult } = require('express-validator');
+const User = require('../models/user.model');
+
+const signup=(req, res)=>{
+    const { firstname, lastname, email, password } = req.body;
+
+    if(!firstname && !lastname && !email && !password) {
+        res.status(505).send({ 
+            status: "error", 
+            error: 'please fill all fields' 
+        });
+        return
+    }
+    else{
+        db.query(findUserByEmailQuery, [email], (err, result)=>{
+            if (err) {
+                res.status(400).send({
+                    status: "error",
+                    message: `${email} exist`
+                });
+            }
+
+            // Validate user
+            // body('firstname').isLength({min: 1}).withMessage('Firstname required'),    
+            // body('firstname').isString().isAlphanumeric(),   
+            // body('lastname').isLength({min: 1}).withMessage('Lastname required'),    
+            // body('lastname').isString().isAlphanumeric(),   
+            // body('email').isEmail.withMessage('Email invalid'),   
+            // body('email').isLength({min: 1}).withMessage('Email required'),   
+            // body('email').exists().withMessage('Email exist'), 
+            // body('email').isString().isAlphanumeric(),   
+            // body('password').isLength({min: 1}).withMessage('Password required'),
+            body('password').isString().isStrongPassword( {
+                minLength: 8,
+                minLowercase: 1,
+                minUppercase: 1,
+                minNumbers: 1,
+                minSymbols: 1,
+                returnScore: false,
+                pointsPerUnique: 1,
+                pointsPerRepeat: 0.5,
+                pointsForContainingLower: 10,
+                pointsForContainingUpper: 10,
+                pointsForContainingNumber: 10,
+                pointsForContainingSymbol: 10
+            }).withMessage('Password must be of 8 min character, min Lowercase: 1, min Uppercase: 1, min Numbers: 1, min Symbols: 1')
+            let error = validationResult(result);
+
+            if (!error.isEmpty()) {
+                console.log(error);
+                res.render('register', {
+                    errors:error.mapped()
+                })
+            } else {
+                const hashedPassword = hashPassword(password);
+                const newUser = new User(firstname,lastname,email, hashedPassword);
+                
+                db.query(createNewUserQuery, [firstname, lastname, email, password], (err)=>{
+                    if(err) {
+                        res.status(402).send({
+                            status: "error",
+                            message: `${email} exist`
+                        });
+                    }
+                    newUser
+                    // user.firstname=firstname;
+                    // user.lastname=lastname;
+                    // user.email=email;
+                    // user.password=hashedPassword;
+                    return res.status(200).send({ 
+                        status: "success", 
+                        success: 'User registered' 
+                    });
+                })
+            }
+            
+            
+            
+        })
+    }
+}
+
+module.exports = signup

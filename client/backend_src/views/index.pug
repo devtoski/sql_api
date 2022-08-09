@@ -1,0 +1,72 @@
+//- extends layout 
+
+//- block content 
+//-     h1 #{title}
+//-     ul.list-group 
+//-         each article, i in articles
+//-             li.list-group-item
+//-                 a(href="/api/articles/"+article._id)= article.title
+
+
+//- <!DOCTYPE html>
+//- <html>
+//- <head>
+//- <meta name="viewport" content="width=device-width, initial-scale=1">
+//- <style>
+//- #more {display: none;}
+//- </style>
+//- </head>
+//- <body>
+
+//- <h2>Read More Read Less Button</h2>
+//- <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas vitae scel<span id="dots">...</span><span id="more">erisque enim ligula venenatis dolor. Maecenas nisl est, ultrices nec congue eget, auctor vitae massa. Fusce luctus vestibulum augue ut aliquet. Nunc sagittis dictum nisi, sed ullamcorper ipsum dignissim ac. In at libero sed nunc venenatis imperdiet sed ornare turpis. Donec vitae dui eget tellus gravida venenatis. Integer fringilla congue eros non fermentum. Sed dapibus pulvinar nibh tempor porta.</span></p>
+//- <button onclick="myFunction()" id="myBtn">Read more</button>
+
+//- <script>
+//- function myFunction() {
+//-   var dots = document.getElementById("dots");
+//-   var moreText = document.getElementById("more");
+//-   var btnText = document.getElementById("myBtn");
+
+//-   if (dots.style.display === "none") {
+//-     dots.style.display = "inline";
+//-     btnText.innerHTML = "Read more"; 
+//-     moreText.style.display = "none";
+//-   } else {
+//-     dots.style.display = "none";
+//-     btnText.innerHTML = "Read less"; 
+//-     moreText.style.display = "inline";
+//-   }
+//- }
+//- </script>
+
+//- </body>
+//- </html>
+
+
+
+
+extends layout 
+
+block content 
+    h1.mb-5 #{title}
+    .row
+        .col-md-12
+            .row
+                each article, i in articles
+                    .col-12.col-sm-6.col-md-6.col-lg-4
+                        .card.shadow-sm
+                            .card-body
+                                h6.card-text= article.title
+                                h6.card-text= article.author
+                                p.card-text= article.body
+                                .d-flex.justify-content-between.align-items-center
+                                    .btn-group
+                                        button.btn.btn-sm.btn-outline-secondary(type="button") Edit
+                                        button.btn.btn-sm.btn-outline-secondary(type="button") Delete
+                                    small.text-muted= article.created_on
+                        //- h6= article.author
+                        //- h5= article.title
+                        //- p= article.body
+                        //- a(href="/api/articles/"+article._id)= article.title
+                        
